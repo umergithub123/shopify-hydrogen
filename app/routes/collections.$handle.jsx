@@ -3,6 +3,7 @@ import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
+import CollectionSorting from '~/components/CollectionSorting';
 
 /**
  * @type {Route.MetaFunction}
@@ -29,9 +30,31 @@ export async function loader(args) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  * @param {Route.LoaderArgs}
  */
+
 async function loadCriticalData({context, params, request}) {
   const {handle} = params;
   const {storefront} = context;
+
+  // ✅ Read sort params from the request URL here, in the loader
+  const url = new URL(request.url);
+  const sortKey = url.searchParams.get('sortKey') || 'MANUAL';
+  const sortReverse = url.searchParams.get('sortReverse') === 'true';
+
+  const filterPrice = url.searchParams.get('price') === 'true' ? true : false;
+  if (filterPrice) {
+    var filterMinPrice = parseFloat(url.searchParams.get('min'));
+    var filterMaxPrice = parseFloat(url.searchParams.get('max'));
+  }
+
+  var filterAvailability = url.searchParams.get('availability');
+  var filterAvailabilityValue = filterAvailability === 'available' 
+  ? true 
+  : filterAvailability === 'soldout' 
+    ? false 
+    : null;
+
+
+  
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
@@ -39,13 +62,30 @@ async function loadCriticalData({context, params, request}) {
   if (!handle) {
     throw redirect('/collections');
   }
-
+  
+  if(filterAvailabilityValue) {
+    console.log('filterAvailabilityValue',filterAvailabilityValue);
+  }
+  
   const [{collection}] = await Promise.all([
-    storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables},
-      // Add other queries here, so that they are loaded in parallel
-    }),
+    storefront.query(
+      filterAvailability 
+        ? COLLECTION_QUERY_FILTER_AVAILABILITY 
+        : filterPrice 
+          ? COLLECTION_QUERY_FILTER_PRICE 
+          : COLLECTION_QUERY,
+      {
+        variables: {handle, sortKey, sortReverse, filterMinPrice, filterMaxPrice,  filterAvailabilityValue, ...paginationVariables},
+      }
+    ),
   ]);
+  // const [{collection}] = await Promise.all([
+
+  //   storefront.query(filterAvailability ? COLLECTION_QUERY_Filter_Availability : COLLECTION_QUERY, {
+  //     variables: {handle, sortKey, sortReverse, filterAvailabilityValue, ...paginationVariables},
+  //     // Add other queries here, so that they are loaded in parallel
+  //   }),
+  // ]);
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, {
@@ -77,6 +117,7 @@ export default function Collection() {
 
   return (
     <div className="collection">
+      <CollectionSorting />
       <h1>{collection.title}</h1>
       <p className="collection-description">{collection.description}</p>
       <PaginatedResourceSection
@@ -141,6 +182,8 @@ const COLLECTION_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $sortKey: ProductCollectionSortKeys
+    $sortReverse: Boolean
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
@@ -151,7 +194,94 @@ const COLLECTION_QUERY = `#graphql
         first: $first,
         last: $last,
         before: $startCursor,
-        after: $endCursor
+        after: $endCursor,
+        sortKey: $sortKey,
+        reverse: $sortReverse
+      ) {
+        nodes {
+          ...ProductItem
+        }
+        pageInfo {
+          hasPreviousPage
+          hasNextPage
+          endCursor
+          startCursor
+        }
+      }
+    }
+  }
+`;
+
+const COLLECTION_QUERY_FILTER_AVAILABILITY = `#graphql
+  ${PRODUCT_ITEM_FRAGMENT}
+  query Collection(
+    $handle: String!
+    $country: CountryCode
+    $language: LanguageCode
+    $first: Int
+    $last: Int
+    $startCursor: String
+    $endCursor: String
+    $sortKey: ProductCollectionSortKeys
+    $sortReverse: Boolean
+    $filterAvailabilityValue: Boolean
+  ) @inContext(country: $country, language: $language) {
+    collection(handle: $handle) {
+      id
+      handle
+      title
+      description
+      products(
+        first: $first,
+        filters: { available: $filterAvailabilityValue},
+        last: $last,
+        before: $startCursor,
+        after: $endCursor,
+        sortKey: $sortKey,
+        reverse: $sortReverse
+      ) {
+        nodes {
+          ...ProductItem
+        }
+        pageInfo {
+          hasPreviousPage
+          hasNextPage
+          endCursor
+          startCursor
+        }
+      }
+    }
+  }
+`;
+
+const COLLECTION_QUERY_FILTER_PRICE = `#graphql
+  ${PRODUCT_ITEM_FRAGMENT}
+  query Collection(
+    $handle: String!
+    $country: CountryCode
+    $language: LanguageCode
+    $first: Int
+    $last: Int
+    $startCursor: String
+    $endCursor: String
+    $sortKey: ProductCollectionSortKeys
+    $sortReverse: Boolean
+    $filterMinPrice: Float
+    $filterMaxPrice: Float
+  ) @inContext(country: $country, language: $language) {
+    collection(handle: $handle) {
+      id
+      handle
+      title
+      description
+      products(
+        first: $first,
+        filters: { price: { min: $filterMinPrice, max: $filterMaxPrice }},
+        last: $last,
+        before: $startCursor,
+        after: $endCursor,
+        sortKey: $sortKey,
+        reverse: $sortReverse
       ) {
         nodes {
           ...ProductItem

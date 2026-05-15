@@ -1,4 +1,5 @@
 import {defineConfig} from 'vite';
+import path from 'path';
 import {hydrogen} from '@shopify/hydrogen/vite';
 import {oxygen} from '@shopify/mini-oxygen/vite';
 import {reactRouter} from '@react-router/dev/vite';
@@ -7,6 +8,9 @@ export default defineConfig({
   plugins: [hydrogen(), oxygen(), reactRouter()],
   resolve: {
     tsconfigPaths: true,
+    alias: {
+      '~': path.resolve(__dirname, './app'),
+    },
   },
   build: {
     // Allow a strict Content-Security-Policy
@@ -29,6 +33,7 @@ export default defineConfig({
         'react-router > set-cookie-parser',
         'react-router > cookie',
         'react-router',
+        'swiper',
       ],
     },
   },

@@ -3,6 +3,8 @@ import {Suspense} from 'react';
 import {Image} from '@shopify/hydrogen';
 import {ProductItem} from '~/components/ProductItem';
 import {MockShopNotice} from '~/components/MockShopNotice';
+import CountryBar from '../components/CountryBar';
+import { CustomSection } from '~/components/sections/CustomSection';
 
 /**
  * @type {Route.MetaFunction}
@@ -35,7 +37,10 @@ async function loadCriticalData({context}) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
+  const country = await context.storefront.query(COUNTRY_QUERY);
+
   return {
+    country,
     isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
     featuredCollection: collections.nodes[0],
   };
@@ -64,8 +69,12 @@ function loadDeferredData({context}) {
 export default function Homepage() {
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
+  const { localization } = data.country;
+
   return (
     <div className="home">
+      <CustomSection />
+      <CountryBar countries={localization.availableCountries} />
       {data.isShopLinked ? null : <MockShopNotice />}
       <FeaturedCollection collection={data.featuredCollection} />
       <RecommendedProducts products={data.recommendedProducts} />
@@ -177,6 +186,17 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     products(first: 4, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
+      }
+    }
+  }
+`;
+
+const COUNTRY_QUERY = `#graphql
+  query country {
+    localization {
+      availableCountries {
+        name
+        isoCode
       }
     }
   }

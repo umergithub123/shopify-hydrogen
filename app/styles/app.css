@@ -643,3 +643,122 @@ button.reset:hover:not(:has(> *)) {
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+
+/* custom css  */
+.parent-menu {
+  position: relative;
+}
+
+.drop-down-menu {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  width: max-content;
+  top: 100%;
+  font-size: 14px;
+  padding: 10px;
+  background: white;
+}
+
+.parent-menu:hover > .drop-down-menu {
+  display: flex;
+}
+
+/* filters on plp  */
+.collection-sorting {
+  display: flex;
+  justify-content: space-between;
+}
+
+.collection-filter {
+  display: flex;
+  gap: 30px;
+}
+
+.availability-filter {
+  display: flex;
+  flex-direction: column;
+  max-width: max-content;
+  gap: 10px;
+  min-width: 160px;
+}
+
+.price-filter label:not([for='filter']) {
+  font-size: 12px;
+}
+
+.availability-filter select {
+  display: none;
+}
+
+.availability-filter select.active {
+  display: block;
+}
+
+.price-filter label[for='filter'],
+.availability-filter label,
+.collection-sorting-form label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.price-filter p {
+  font-size: 13px;
+}
+
+.price-filter input {
+  margin: 0;
+  padding: 0;
+}
+
+.price-filter label[for='filter'] {
+  padding-bottom: 10px;
+}
+
+.price-filter {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.price-filter button {
+  max-width: fit-content;
+  margin-top: 10px;
+}
+
+.price-label-arrow__content label:nth-of-type(2) {
+  padding-top: 10px;
+}
+
+.collection-sorting-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.collection-sorting svg {
+  width: 16px;
+  stroke-width: 3px;
+}
+
+.label-filter__header,
+.price-label-arrow__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 30px;
+  cursor: pointer;
+}
+
+.price-label-arrow__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-label-arrow__content {
+  display: none;
+}
+
+.price-label-arrow__content.active {
+  display: flex;
+}

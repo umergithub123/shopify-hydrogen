@@ -65,8 +65,9 @@ export function HeaderMenu({
             ? new URL(item.url).pathname
             : item.url;
         return (
+          console.log('item', item),
           <NavLink
-            className="header-menu-item"
+            className={`header-menu-item ${item?.items.length > 0 ? "parent-menu" : ""}`}
             end
             key={item.id}
             onClick={close}
@@ -75,6 +76,35 @@ export function HeaderMenu({
             to={url}
           >
             {item.title}
+            {item?.items.length > 0 && (
+             <div className='drop-down-menu'>
+              {item.items.map((item)=> {
+                if (!item.url) return null;
+
+                const url =
+                  item.url.includes('myshopify.com') ||
+                  item.url.includes(publicStoreDomain) ||
+                  item.url.includes(primaryDomainUrl)
+                    ? new URL(item.url).pathname
+                    : item.url;
+
+                    return (
+                      <NavLink
+                        className="header-menu-item-child"
+                        end
+                        key={item.id}
+                        onClick={close}
+                        prefetch="intent"
+                        style={activeLinkStyle}
+                        to={url}
+                      >
+                        {item.title}
+                      </NavLink>
+                    )  
+                })
+              }
+             </div>
+            )}
           </NavLink>
         );
       })}
