@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --aside-width: 400px;
   --cart-aside-summary-height-with-discount: 300px;
@@ -761,4 +763,10 @@ button.reset:hover:not(:has(> *)) {
 
 .price-label-arrow__content.active {
   display: flex;
+}
+
+/* cart drawer css  */
+section[aria-label='Discounts'],
+section[aria-label='Gift cards'] {
+  padding: 0;
 }

@@ -15,6 +15,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@shopify/hydrogen": "2026.4.2",
+    "@tailwindcss/vite": "^4.3.0",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
     "isbot": "^5.1.22",
@@ -22,7 +23,8 @@
     "react-dom": "^18.3.1",
     "react-router": "7.14.0",
     "react-router-dom": "7.14.0",
-    "swiper": "^12.1.4"
+    "swiper": "^12.1.4",
+    "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",

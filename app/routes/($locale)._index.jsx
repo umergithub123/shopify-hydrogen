@@ -3,8 +3,8 @@ import {Suspense} from 'react';
 import {Image} from '@shopify/hydrogen';
 import {ProductItem} from '~/components/ProductItem';
 import {MockShopNotice} from '~/components/MockShopNotice';
-import CountryBar from '../components/CountryBar';
-import { CustomSection } from '~/components/sections/CustomSection';
+// import CountryBar from '../components/CountryBar';
+// import { CustomSection } from '~/components/sections/CustomSection';
 
 /**
  * @type {Route.MetaFunction}
@@ -73,8 +73,8 @@ export default function Homepage() {
 
   return (
     <div className="home">
-      <CustomSection />
-      <CountryBar countries={localization.availableCountries} />
+      {/* <CustomSection /> */}
+      {/* <CountryBar countries={localization.availableCountries} /> */}
       {data.isShopLinked ? null : <MockShopNotice />}
       <FeaturedCollection collection={data.featuredCollection} />
       <RecommendedProducts products={data.recommendedProducts} />

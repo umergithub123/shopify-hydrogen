@@ -3,6 +3,9 @@ import {Link} from 'react-router';
 import {useAside} from '~/components/Aside';
 import {CartLineItem} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
+import ShippingBar from '~/components/ShippingBar';
+import { Suspense } from 'react';
+import { Await } from 'react-router';
 /**
  * Returns a map of all line items and their children.
  * @param {CartLine[]} lines
@@ -65,17 +68,25 @@ export function CartMain({layout, cart: originalCart}) {
                 return null;
               }
               return (
-                <CartLineItem
-                  key={line.id}
-                  line={line}
-                  layout={layout}
-                  childrenMap={childrenMap}
-                />
+                <>
+                  <Suspense fallback={<p>Loading Shipping info...</p>}>
+                    <Await resolve={cart}>
+                      {(cart) => <ShippingBar cartData={cart} />}
+                    </Await>  
+                  </Suspense>  
+                  <CartLineItem
+                    key={line.id}
+                    line={line}
+                    layout={layout}
+                    childrenMap={childrenMap}
+                  />
+                </>
               );
             })}
           </ul>
         </div>
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
+        {cartHasItems && <CartSummary cart={cart} layout={layout} />
+        }
       </div>
     </section>
   );

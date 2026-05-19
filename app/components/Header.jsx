@@ -2,6 +2,7 @@ import {Suspense} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {useAside} from '~/components/Aside';
+import AnnouncementBar from './AnnouncementBar';
 
 /**
  * @param {HeaderProps}
@@ -9,18 +10,21 @@ import {useAside} from '~/components/Aside';
 export function Header({header, isLoggedIn, cart, publicStoreDomain}) {
   const {shop, menu} = header;
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
-      </NavLink>
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
-    </header>
+    <>
+      <AnnouncementBar />
+      <header className="header">
+        <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
+          <strong>{shop.name}</strong>
+        </NavLink>
+        <HeaderMenu
+          menu={menu}
+          viewport="desktop"
+          primaryDomainUrl={header.shop.primaryDomain.url}
+          publicStoreDomain={publicStoreDomain}
+        />
+        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+      </header>
+    </>  
   );
 }
 
@@ -65,7 +69,6 @@ export function HeaderMenu({
             ? new URL(item.url).pathname
             : item.url;
         return (
-          console.log('item', item),
           <NavLink
             className={`header-menu-item ${item?.items.length > 0 ? "parent-menu" : ""}`}
             end
