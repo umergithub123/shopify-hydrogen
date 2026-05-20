@@ -10,6 +10,8 @@ import {
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 
+import { useFetcher } from 'react-router';
+import { useEffect, useState } from 'react';
 /**
  * @param {PageLayoutProps}
  */
@@ -21,6 +23,23 @@ export function PageLayout({
   isLoggedIn,
   publicStoreDomain,
 }) {
+
+  const fetcher = useFetcher();
+
+  const [pageData, setpageData] = useState(null);
+  useEffect(()=>{
+    if (fetcher.state === 'idle' && fetcher.data === null) {
+      fetcher.load('/pages/announcement-bar');
+    }
+  },[fetcher])
+
+  useEffect(()=>{
+    if (fetcher.data) {
+      setpageData(fetcher.data);
+    }
+  },[fetcher.data])
+  console.log('pageData------',pageData);
+  
   return (
     <Aside.Provider>
       <CartAside cart={cart} />
